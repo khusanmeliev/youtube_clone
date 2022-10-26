@@ -1,25 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Search from "./cloneMain/Search/Search.jsx";
+import { VideoLists, VideoMain, VideoSec, Wrapper } from "./styles.js";
+import URL from "./cloneMain/api/URL";
+import Video from "./cloneMain/Video/Video";
+import ListVideos from "./cloneMain/ListVideos/ListVideos.jsx";
 
-function App() {
+const App = () => {
+  const [videos, setVideos] = useState([]);
+  const [selectedVideos, setSelectedVideos] = useState({ id: {}, snippet: {} });
+
+  async function videoSubmit(searchTerm) {
+    const {
+      data: { items: videos },
+    } = await URL.get("search", {
+      params: {
+        part: "snippet",
+        maxResults: 5,
+        key: " AIzaSyAYnnSTDkcUOoV7COZqu5iP-FiviwsaRhY",
+        q: searchTerm,
+      },
+    });
+
+    console.log(videos);
+    setVideos(videos);
+    setSelectedVideos(videos[0]);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Wrapper>
+      <div>
+        <Search onSubmit={videoSubmit} />
+      </div>
+
+      <VideoMain>
+        <VideoSec>
+          <Video video={selectedVideos} />
+        </VideoSec>
+        <VideoLists>
+          <ListVideos videos={videos} onVideoSelect={setSelectedVideos} />
+        </VideoLists>
+      </VideoMain>
+    </Wrapper>
   );
-}
+};
 
 export default App;
